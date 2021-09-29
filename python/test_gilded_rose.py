@@ -75,16 +75,21 @@ class GildedRoseBackStagePassTest(unittest.TestCase):
 class GildedRoseSulfurasTest(unittest.TestCase):
     
     def testThatSulfurasQualityDoesntDecrease(self):
-        items = [Item(GildedRose.SULFURAS, 10, 50)]
+        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_VALUE)]
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
-        self.assertEqual(50, items[0].quality)
+        self.assertEqual(GildedRose.SULFURAS_VALUE, items[0].quality)
 
     def testThatSulfurasSellInDateDoesntDecrease(self):
-        items = [Item(GildedRose.SULFURAS, 10, 50)]
+        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_VALUE)]
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
         self.assertEqual(10, items[0].sell_in)
+
+    def testThatSulfurasQualityGetsSetTo80(self):
+        items = [Item(GildedRose.SULFURAS, 10, 49)]
+        gilded_rose = GildedRose(items)
+        self.assertEqual(GildedRose.SULFURAS_VALUE, items[0].quality)
 
 class GildedRoseAgedBrieTest(unittest.TestCase):
 
@@ -107,6 +112,18 @@ class GildedRoseConjuredItemTest(unittest.TestCase):
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
         self.assertTrue(isinstance(items[0], ConjuredItem))
+    
+    def testThatQualityOfConjuredItemReducesBy2NextDay(self):
+        items = [ConjuredItem("a conjured item", 10, 30)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertEqual(28, items[0].quality)
+
+    def testThatQualityOfConjuredItemDontGoNegative(self):
+        items = [ConjuredItem("a conjured item", 5, 1)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertGreaterEqual(0, items[0].quality)
 
 
 if __name__ == '__main__':
