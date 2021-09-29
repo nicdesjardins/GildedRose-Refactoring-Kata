@@ -10,37 +10,27 @@ class GildedRose(object):
     MINIMUM_QUALITY = 0
     
     itemsThatDontDecreaseSellIn = [SULFURAS]
-    itemsThatDontDecreaseInQuality = [SULFURAS, AGED_BRIE, BACKSTAGE_PASSES]
+    itemsThatDontDecreaseInQuality = [
+        SULFURAS, 
+        AGED_BRIE, 
+        BACKSTAGE_PASSES
+    ]
 
     def __init__(self, items):
         self.items = items
-        self.correctCapInitialQualities()
-
-    def correctCapInitialQualities(self):
-        for item in self.items:
-            if item.quality > self.MAXIMUM_QUALITY:
-                item.quality = self.MAXIMUM_QUALITY
+        self.capInitialQualities()
 
     def nextDay(self):
         self.update_quality()
     
-    def shouldDecreaseSellIn(self, item):
-        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
-
-    def shouldDecreateInQuality(self, item):
-        return not self.itemsThatDontDecreaseInQuality.__contains__(item.name) and not self.itemHasReachedMinimumQuality(item)
-
-    def itemHasReachedMinimumQuality(self, item):
-        return item.quality <= self.MINIMUM_QUALITY
-
     def update_quality(self):
         for item in self.items:
             
             if self.shouldDecreaseSellIn(item):
-                item.sell_in = item.sell_in - 1
+                self.decreateSellIn(item)
             
             if(self.shouldDecreateInQuality(item)):
-                item.quality = item.quality - 1
+                self.decreaseQuality(item)
             else:
                 if item.quality < self.MAXIMUM_QUALITY:
                     item.quality = item.quality + 1
@@ -63,7 +53,29 @@ class GildedRose(object):
                 else:
                     if item.quality < self.MAXIMUM_QUALITY:
                         item.quality = item.quality + 1
+    
+    def decreaseQuality(self, item):
+        item.quality = item.quality - 1
 
+    def decreateSellIn(self, item):
+        item.sell_in = item.sell_in - 1
+    
+    def shouldDecreaseSellIn(self, item):
+        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
+
+    def shouldDecreateInQuality(self, item):
+        return (
+            not self.itemsThatDontDecreaseInQuality.__contains__(item.name) 
+            and not self.itemHasReachedMinimumQuality(item)
+        )
+
+    def itemHasReachedMinimumQuality(self, item):
+        return item.quality <= self.MINIMUM_QUALITY
+
+    def capInitialQualities(self):
+        for item in self.items:
+            if item.quality > self.MAXIMUM_QUALITY:
+                item.quality = self.MAXIMUM_QUALITY
 
 class Item:
     def __init__(self, name, sell_in, quality):
@@ -76,3 +88,6 @@ class Item:
 
     def __str__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
+
+class ConjuredItem(Item):
+    isConjured = True

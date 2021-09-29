@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from gilded_rose import Item, GildedRose
+from gilded_rose import Item, GildedRose, ConjuredItem
 
 class GildedRoseNormalItemTest(unittest.TestCase):
     
@@ -39,6 +39,12 @@ class GildedRoseNormalItemTest(unittest.TestCase):
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
         self.assertLess(items[0].sell_in, 0)
+    
+    def testThatNonConjuredItemsAreNotConjured(self):
+        items = [Item("non-conjured item", 5, 10)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertFalse(isinstance(items[0], ConjuredItem))
 
 class GildedRoseBackStagePassTest(unittest.TestCase):
 
@@ -93,6 +99,14 @@ class GildedRoseAgedBrieTest(unittest.TestCase):
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
         self.assertEqual(31, items[0].quality)
+
+class GildedRoseConjuredItemTest(unittest.TestCase):
+    
+    def testThatConjuredItemsAreConjured(self):
+        items = [ConjuredItem("conjured item", 5, 10)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertTrue(isinstance(items[0], ConjuredItem))
 
 
 if __name__ == '__main__':
