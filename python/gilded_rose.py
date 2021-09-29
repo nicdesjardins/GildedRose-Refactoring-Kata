@@ -8,8 +8,11 @@ class GildedRose(object):
 
     MAXIMUM_QUALITY = 50
     MINIMUM_QUALITY = 0
+    NORMAL_RATE_OF_QUALITY_DECREASE = 1
     
     itemsThatDontDecreaseSellIn = [SULFURAS]
+    SULFURAS_VALUE = 80
+
     itemsThatDontDecreaseInQuality = [
         SULFURAS, 
         AGED_BRIE, 
@@ -32,7 +35,7 @@ class GildedRose(object):
             if(self.shouldDecreateInQuality(item)):
                 self.decreaseQuality(item)
             else:
-                if item.quality < self.MAXIMUM_QUALITY:
+                if self.canIncreaseQuality(item):
                     item.quality = item.quality + 1
                     if item.name == self.BACKSTAGE_PASSES:
                         if item.sell_in < 11:
@@ -54,8 +57,22 @@ class GildedRose(object):
                     if item.quality < self.MAXIMUM_QUALITY:
                         item.quality = item.quality + 1
     
+    def isConjuredItem(self, item):
+        return isinstance(item, ConjuredItem)
+    
+    def canIncreaseQuality(self, item):
+        return item.quality < self.MAXIMUM_QUALITY
+
+    def rateOfQualityDecrease(self, item):
+        if(self.isConjuredItem(item)):
+            return self.NORMAL_RATE_OF_QUALITY_DECREASE * 2
+        else:
+            return self.NORMAL_RATE_OF_QUALITY_DECREASE
+
     def decreaseQuality(self, item):
-        item.quality = item.quality - 1
+        item.quality = item.quality - self.rateOfQualityDecrease(item)
+        if item.quality < 0: # quality is never negative
+            item.quality = 0
 
     def decreateSellIn(self, item):
         item.sell_in = item.sell_in - 1
@@ -74,8 +91,11 @@ class GildedRose(object):
 
     def capInitialQualities(self):
         for item in self.items:
-            if item.quality > self.MAXIMUM_QUALITY:
-                item.quality = self.MAXIMUM_QUALITY
+            if(item.name != self.SULFURAS):
+                if item.quality > self.MAXIMUM_QUALITY:
+                    item.quality = self.MAXIMUM_QUALITY
+            else:
+                item.quality = self.SULFURAS_VALUE
 
 class Item:
     def __init__(self, name, sell_in, quality):
