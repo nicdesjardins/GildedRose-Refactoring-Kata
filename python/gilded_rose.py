@@ -7,8 +7,10 @@ class GildedRose(object):
     BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert"
 
     MAXIMUM_QUALITY = 50
+    MINIMUM_QUALITY = 0
     
     itemsThatDontDecreaseSellIn = [SULFURAS]
+    itemsThatDontDecreaseInQuality = [SULFURAS, AGED_BRIE, BACKSTAGE_PASSES]
 
     def __init__(self, items):
         self.items = items
@@ -25,16 +27,20 @@ class GildedRose(object):
     def shouldDecreaseSellIn(self, item):
         return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
 
+    def shouldDecreateInQuality(self, item):
+        return not self.itemsThatDontDecreaseInQuality.__contains__(item.name) and not self.itemHasReachedMinimumQuality(item)
+
+    def itemHasReachedMinimumQuality(self, item):
+        return item.quality <= self.MINIMUM_QUALITY
+
     def update_quality(self):
         for item in self.items:
             
-            if self.shouldDecreaseSellIn(item): #item.name != self.SULFURAS:
+            if self.shouldDecreaseSellIn(item):
                 item.sell_in = item.sell_in - 1
             
-            if item.name != self.AGED_BRIE and item.name != self.BACKSTAGE_PASSES:
-                if item.quality > 0:
-                    if item.name != self.SULFURAS:
-                        item.quality = item.quality - 1
+            if(self.shouldDecreateInQuality(item)):
+                item.quality = item.quality - 1
             else:
                 if item.quality < self.MAXIMUM_QUALITY:
                     item.quality = item.quality + 1
