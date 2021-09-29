@@ -28,40 +28,42 @@ class GildedRoseNormalItemTest(unittest.TestCase):
         GildedRose(items)
         self.assertLessEqual(items[0].quality, GildedRose.MAXIMUM_QUALITY)
     
-    def testThatQualityNeverGoesBelowZero(self):
+    def testThatQualityOfAnItemIsNeverNegative(self):
         items = [Item("an item", 0, 0)]
-        gilden_rose = GildedRose(items)
-        gilden_rose.nextDay()
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
         self.assertEqual(0, items[0].quality)
+    
+    def testThatSellInCanBeLessThanZero(self):
+        items = [Item("an item", 0, 5)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertLess(items[0].sell_in, 0)
 
 class GildedRoseBackStagePassTest(unittest.TestCase):
 
     def testThatBackStagePassesQualityIncreasesBy1AtMoreThan10DaysLeft(self):
         items = [Item(GildedRose.BACKSTAGE_PASSES, 12, 25)]
-        gilden_rose = GildedRose(items)
-        gilden_rose.nextDay()
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
         self.assertEqual(26, items[0].quality)
     
     def testThatBackStagePassesQualityIncreasesBy2AtLessThanOrEq10DaysLeft(self):
         items = [Item(GildedRose.BACKSTAGE_PASSES, 11, 25)]
-        gilden_rose = GildedRose(items)
-        gilden_rose.nextDay()
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
         self.assertEqual(27, items[0].quality)
     
     def testThatBackStagePassesQualityIncreasesBy3AtLessThanOrEq5DaysLeft(self):
         items = [Item(GildedRose.BACKSTAGE_PASSES, 6, 25)]
-        gilden_rose = GildedRose(items)
-        gilden_rose.nextDay()
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
         self.assertEqual(28, items[0].quality)
     
     def testThatBackStagePassesQualityDropsToZeroAfterConcert(self):
-        items = [Item(GildedRose.BACKSTAGE_PASSES, 1, 10)]
-        gilden_rose = GildedRose(items)
-        gilden_rose.nextDay()
-        self.assertEqual(13, items[0].quality)
-        gilden_rose.nextDay()
-        self.assertEqual(0, items[0].quality)
-        gilden_rose.nextDay()
+        items = [Item(GildedRose.BACKSTAGE_PASSES, 0, 10)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
         self.assertEqual(0, items[0].quality)
 
 class GildedRoseSulfurasTest(unittest.TestCase):
