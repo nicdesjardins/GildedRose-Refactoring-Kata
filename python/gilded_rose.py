@@ -8,6 +8,8 @@ class GildedRose(object):
 
     MAXIMUM_QUALITY = 50
     
+    itemsThatDontDecreaseSellIn = [SULFURAS]
+
     def __init__(self, items):
         self.items = items
         self.correctCapInitialQualities()
@@ -20,10 +22,13 @@ class GildedRose(object):
     def nextDay(self):
         self.update_quality()
     
+    def shouldDecreaseSellIn(self, item):
+        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
+
     def update_quality(self):
         for item in self.items:
             
-            if item.name != self.SULFURAS:
+            if self.shouldDecreaseSellIn(item): #item.name != self.SULFURAS:
                 item.sell_in = item.sell_in - 1
             
             if item.name != self.AGED_BRIE and item.name != self.BACKSTAGE_PASSES:
