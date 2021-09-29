@@ -5,4 +5,4 @@ obj
 vendor
 .idea
 *.iml
-.vscode/*
+.vscode
