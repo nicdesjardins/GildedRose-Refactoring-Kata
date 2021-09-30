@@ -77,7 +77,7 @@ class GildedRose(object):
             self.decreaseItemQuality(item)
         else:
             if self.canIncreaseQuality(item):
-                self.increaseQuality(item)
+                self.increaseItemQuality(item)
         
         if self.sellInHasPassed(item):
             self.adjustItemQualityPassedSellIn(item)
@@ -108,7 +108,7 @@ class GildedRose(object):
     
     def sellInHasPassed(self, item):
         return item.sell_in < self.SELLIN_PASSED_THRESHOLD
-
+    
     def adjustItemQualityPassedSellIn(self, item):
         if item.name == self.BACKSTAGE_PASSES:
             item.quality = self.BACKSTAGE_PASS_QUALITY_AFTER_SELL_IN_PASSED
@@ -123,7 +123,7 @@ class GildedRose(object):
         
         return qualityIncrease
     
-    def increaseQuality(self, item):
+    def increaseItemQuality(self, item):
         item.quality += self.getQualityIncrease(item)
         self.capItemQualityToMax(item)
     
