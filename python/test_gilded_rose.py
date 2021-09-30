@@ -119,6 +119,12 @@ class GildedRoseConjuredItemTest(unittest.TestCase):
         gilded_rose.nextDay()
         self.assertEqual(28, items[0].quality)
 
+    def testThatQualityOfConjuredItemReducesBy4AfterSellByPassed(self):
+        items = [ConjuredItem("a conjured item", 0, 30)]
+        gilded_rose = GildedRose(items)
+        gilded_rose.nextDay()
+        self.assertEqual(26, items[0].quality)
+
     def testThatQualityOfConjuredItemDontGoNegative(self):
         items = [ConjuredItem("a conjured item", 5, 1)]
         gilded_rose = GildedRose(items)

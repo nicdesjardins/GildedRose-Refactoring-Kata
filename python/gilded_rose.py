@@ -4,7 +4,7 @@ class GildedRose(object):
 
     SULFURAS = "Sulfuras, Hand of Ragnaros"
     AGED_BRIE = "Aged Brie"
-    BACKSTAGE_PASSES = "Backstage passes to a TAFKAL80ETC concert"
+    BACKSTAGE_PASSES = "Backstage passes"
 
     MAXIMUM_QUALITY = 50
     MINIMUM_QUALITY = 0
@@ -27,66 +27,84 @@ class GildedRose(object):
         self.update_quality()
     
     def update_quality(self):
+        
         for item in self.items:
             
-            if self.shouldDecreaseSellIn(item):
-                self.decreateSellIn(item)
+            self.updateSellIn(item)
             
-            if(self.shouldDecreateInQuality(item)):
+            if(self.itemDecreasesInQuality(item)):
                 self.decreaseQuality(item)
             else:
                 if self.canIncreaseQuality(item):
-                    item.quality = item.quality + 1
-                    if item.name == self.BACKSTAGE_PASSES:
-                        if item.sell_in < 11:
-                            if item.quality < self.MAXIMUM_QUALITY:
-                                item.quality = item.quality + 1
-                        if item.sell_in < 6:
-                            if item.quality < self.MAXIMUM_QUALITY:
-                                item.quality = item.quality + 1
+                    self.increaseQuality(item)
             
-            if item.sell_in < 0:
-                if item.name != self.AGED_BRIE:
-                    if item.name != self.BACKSTAGE_PASSES:
-                        if item.quality > 0:
-                            if item.name != self.SULFURAS:
-                                item.quality = item.quality - 1
-                    else:
-                        item.quality = item.quality - item.quality
-                else:
-                    if item.quality < self.MAXIMUM_QUALITY:
-                        item.quality = item.quality + 1
+            if self.sellInHasPassed(item):
+                if item.name == self.BACKSTAGE_PASSES:
+                    item.quality = 0
     
-    def isConjuredItem(self, item):
-        return isinstance(item, ConjuredItem)
+    def isAgedBrie(self, item):
+        return item.name == self.AGED_BRIE
+
+    def updateSellIn(self, item):
+        if self.itemDecreasesSellIn(item):
+            self.decreaseSellIn(item)
+
+    def increaseQuality(self, item):
+        item.quality = item.quality + 1
+        if item.name == self.BACKSTAGE_PASSES:
+            if item.sell_in < 11:
+                if item.quality < self.MAXIMUM_QUALITY:
+                    item.quality = item.quality + 1
+            if item.sell_in < 6:
+                if item.quality < self.MAXIMUM_QUALITY:
+                    item.quality = item.quality + 1
+    
+    def isSpecialItem(self, item):
+        return (
+            self.itemsThatDontDecreaseInQuality.__contains__(item.name)
+        )
+    
+    def sellInHasPassed(self, item):
+        return item.sell_in < 0
     
     def canIncreaseQuality(self, item):
         return item.quality < self.MAXIMUM_QUALITY
-
-    def rateOfQualityDecrease(self, item):
-        if(self.isConjuredItem(item)):
-            return self.NORMAL_RATE_OF_QUALITY_DECREASE * 2
-        else:
-            return self.NORMAL_RATE_OF_QUALITY_DECREASE
-
-    def decreaseQuality(self, item):
-        item.quality = item.quality - self.rateOfQualityDecrease(item)
-        if item.quality < 0: # quality is never negative
-            item.quality = 0
-
-    def decreateSellIn(self, item):
-        item.sell_in = item.sell_in - 1
     
-    def shouldDecreaseSellIn(self, item):
-        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
-
-    def shouldDecreateInQuality(self, item):
+    def itemDecreasesInQuality(self, item):
         return (
             not self.itemsThatDontDecreaseInQuality.__contains__(item.name) 
-            and not self.itemHasReachedMinimumQuality(item)
         )
+    
+    def decreaseQuality(self, item):
+        item.quality = item.quality - self.qualityDecreaseRate(item)
+        if item.quality < 0: # quality is never negative
+            item.quality = 0
+    
+    def qualityDecreaseRate(self, item):
+        rate = self.NORMAL_RATE_OF_QUALITY_DECREASE
+        
+        if self.isConjuredItem(item):
+            rate *= 2
+        
+        if self.sellInHasPassed(item):
+            rate *= 2
 
-    def itemHasReachedMinimumQuality(self, item):
+        return rate
+    
+    def isConjuredItem(self, item):
+        return isinstance(item, ConjuredItem)
+
+    
+
+    def decreaseSellIn(self, item):
+        item.sell_in = item.sell_in - 1
+    
+    def itemDecreasesSellIn(self, item):
+        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
+
+    
+
+    def hasReachedMinimumQuality(self, item):
         return item.quality <= self.MINIMUM_QUALITY
 
     def capInitialQualities(self):
