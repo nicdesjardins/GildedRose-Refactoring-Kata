@@ -75,13 +75,13 @@ class GildedRoseBackStagePassTest(unittest.TestCase):
 class GildedRoseSulfurasTest(unittest.TestCase):
     
     def testThatSulfurasQualityDoesntDecrease(self):
-        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_VALUE)]
+        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_UNCHANGING_VALUE)]
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
-        self.assertEqual(GildedRose.SULFURAS_VALUE, items[0].quality)
+        self.assertEqual(GildedRose.SULFURAS_UNCHANGING_VALUE, items[0].quality)
 
     def testThatSulfurasSellInDateDoesntDecrease(self):
-        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_VALUE)]
+        items = [Item(GildedRose.SULFURAS, 10, GildedRose.SULFURAS_UNCHANGING_VALUE)]
         gilded_rose = GildedRose(items)
         gilded_rose.nextDay()
         self.assertEqual(10, items[0].sell_in)
@@ -89,7 +89,7 @@ class GildedRoseSulfurasTest(unittest.TestCase):
     def testThatSulfurasQualityGetsSetTo80(self):
         items = [Item(GildedRose.SULFURAS, 10, 49)]
         gilded_rose = GildedRose(items)
-        self.assertEqual(GildedRose.SULFURAS_VALUE, items[0].quality)
+        self.assertEqual(GildedRose.SULFURAS_UNCHANGING_VALUE, items[0].quality)
 
 class GildedRoseAgedBrieTest(unittest.TestCase):
 
