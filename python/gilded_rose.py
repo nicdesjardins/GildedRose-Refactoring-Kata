@@ -41,9 +41,6 @@ class GildedRose(object):
             if self.sellInHasPassed(item):
                 if item.name == self.BACKSTAGE_PASSES:
                     item.quality = 0
-    
-    def isAgedBrie(self, item):
-        return item.name == self.AGED_BRIE
 
     def updateSellIn(self, item):
         if self.itemDecreasesSellIn(item):
