@@ -109,12 +109,11 @@ class GildedRose(object):
             for range in self.itemQualityIncreaseBySellInRange[item.name]:
                 if range['start'] <= item.sell_in <= range['end']:
                     qualityIncrease = range['qualityIncrease']
+        
         return qualityIncrease
     
     def increaseQuality(self, item):
-        multiplier = self.getQualityIncrease(item)
-
-        item.quality += multiplier
+        item.quality += self.getQualityIncrease(item)
         self.capItemQualityToMax(item)
     
     def isSpecialItem(self, item):
@@ -122,11 +121,8 @@ class GildedRose(object):
             self.itemsThatDontDecreaseInQuality.__contains__(item.name)
         )
     
-    
-    
     def canIncreaseQuality(self, item):
         return item.quality < self.MAXIMUM_QUALITY
-    
     
     def hasReachedMinimumQuality(self, item):
         return item.quality <= self.MINIMUM_QUALITY
@@ -134,7 +130,6 @@ class GildedRose(object):
     def capItemQualityToMax(self, item):
         if item.quality > self.MAXIMUM_QUALITY:
             item.quality = self.MAXIMUM_QUALITY
-    
     
 
 class Item:
@@ -144,10 +139,8 @@ class Item:
         self.quality = quality
 
     def __repr__(self):
-        return self.___str___
-
-    def __str__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
+
 
 class ConjuredItem(Item):
     isConjured = True
