@@ -61,6 +61,16 @@ class GildedRose(object):
         self.updateItemSellIn(item)
         self.updateItemQuality(item)
 
+    def updateItemSellIn(self, item):
+        if self.itemDecreasesSellIn(item):
+            self.decreaseSellIn(item)
+    
+    def itemDecreasesSellIn(self, item):
+        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
+    
+    def decreaseSellIn(self, item):
+        item.sell_in -= self.SELLIN_DECREASE_RATE
+    
     def updateItemQuality(self, item):
 
         if(self.itemDecreasesInQuality(item)):
@@ -102,16 +112,6 @@ class GildedRose(object):
     def adjustItemQualityPassedSellIn(self, item):
         if item.name == self.BACKSTAGE_PASSES:
             item.quality = self.BACKSTAGE_PASS_QUALITY_AFTER_SELL_IN_PASSED
-
-    def updateItemSellIn(self, item):
-        if self.itemDecreasesSellIn(item):
-            self.decreaseSellIn(item)
-    
-    def itemDecreasesSellIn(self, item):
-        return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
-    
-    def decreaseSellIn(self, item):
-        item.sell_in -= self.SELLIN_DECREASE_RATE
 
     def getQualityIncrease(self, item):
         qualityIncrease = self.QUALITY_INCREASE_RATE
