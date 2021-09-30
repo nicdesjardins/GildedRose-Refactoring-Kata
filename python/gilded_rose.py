@@ -10,7 +10,14 @@ class GildedRose(object):
     MINIMUM_QUALITY = 0
     BACKSTAGE_PASS_QUALITY_AFTER_SELL_IN_PASSED = 0
 
-    NORMAL_RATE_OF_QUALITY_DECREASE = 1
+    QUALITY_DECREASE_RATE = 1
+    QUALITY_DECREASE_CONJURED_ITEM_MULTIPLIER = 2
+    QUALITY_DECREASE_SELLIN_PASSED_MULTIPLIER = 2
+
+    QUALITY_INCREASE_RATE = 1
+
+    SELLIN_DECREASE_RATE = 1
+    SELLIN_PASSED_THRESHOLD = 0
 
     itemsThatDontDecreaseSellIn = [SULFURAS]
     SULFURAS_UNCHANGING_VALUE = 80
@@ -21,10 +28,14 @@ class GildedRose(object):
         BACKSTAGE_PASSES
     ]
 
+    KEY_RANGE_START = 'start'
+    KEY_RANGE_END = 'end'
+    KEY_QUALITY_INCREASE = 'qualityIncrease'
+
     itemQualityIncreaseBySellInRange = {
         BACKSTAGE_PASSES: [
-            { 'start': 0, 'end': 5, 'qualityIncrease': 3 },
-            { 'start': 6, 'end': 10, 'qualityIncrease': 2 }
+            { KEY_RANGE_START: 0, KEY_RANGE_END: 5, KEY_QUALITY_INCREASE: 3 },
+            { KEY_RANGE_START: 6, KEY_RANGE_END: 10, KEY_QUALITY_INCREASE: 2 }
         ]
     }
 
@@ -67,18 +78,18 @@ class GildedRose(object):
         )
     
     def decreaseItemQuality(self, item):
-        item.quality = item.quality - self.qualityDecreaseRate(item)
+        item.quality -= self.qualityDecreaseRate(item)
         if item.quality < 0: # quality is never negative
             item.quality = 0
     
     def qualityDecreaseRate(self, item):
-        rate = self.NORMAL_RATE_OF_QUALITY_DECREASE
+        rate = self.QUALITY_DECREASE_RATE
         
         if self.isConjuredItem(item):
-            rate *= 2
+            rate *= self.QUALITY_DECREASE_CONJURED_ITEM_MULTIPLIER
         
         if self.sellInHasPassed(item):
-            rate *= 2
+            rate *= self.QUALITY_DECREASE_SELLIN_PASSED_MULTIPLIER
 
         return rate
     
@@ -86,7 +97,7 @@ class GildedRose(object):
         return isinstance(item, ConjuredItem)
     
     def sellInHasPassed(self, item):
-        return item.sell_in < 0
+        return item.sell_in < self.SELLIN_PASSED_THRESHOLD
 
     def adjustItemQualityPassedSellIn(self, item):
         if item.name == self.BACKSTAGE_PASSES:
@@ -100,15 +111,15 @@ class GildedRose(object):
         return not self.itemsThatDontDecreaseSellIn.__contains__(item.name)
     
     def decreaseSellIn(self, item):
-        item.sell_in = item.sell_in - 1
+        item.sell_in -= self.SELLIN_DECREASE_RATE
 
     def getQualityIncrease(self, item):
-        qualityIncrease = 1
+        qualityIncrease = self.QUALITY_INCREASE_RATE
         
         if self.itemQualityIncreaseBySellInRange.__contains__(item.name):
             for range in self.itemQualityIncreaseBySellInRange[item.name]:
-                if range['start'] <= item.sell_in <= range['end']:
-                    qualityIncrease = range['qualityIncrease']
+                if range[self.KEY_RANGE_START] <= item.sell_in <= range[self.KEY_RANGE_END]:
+                    qualityIncrease = range[self.KEY_QUALITY_INCREASE]
         
         return qualityIncrease
     
